@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class Test {
 
    static boolean visite[];
@@ -34,12 +36,16 @@ public class Test {
    
    public static void main(String[] args) {
 		//testGraph();
-		int[][] image = SeamCarving.readpgm("ex3.pgm");
+		int[][] image = SeamCarving.readpgm("test.pgm");
 		int[][] interest = SeamCarving.interest(image);
 		//SeamCarving.writepgm(image, "testCpy.pgm");
 		SeamCarving.writepgm(interest, "interestTest.pgm");
 		Graph graphe = SeamCarving.toGraph(interest);
 		graphe.writeFile("gr_test");
+		ArrayList<Integer> arl = new ArrayList<>();
+		arl = SeamCarving.tritopo(graphe);
+		ArrayList<Integer> ccm = new ArrayList<>();
+		ccm = SeamCarving.bellman(graphe, 1, graphe.vertices() - 1, arl);
 		//SeamCarving.writepgm(image, "waw.pgm");
 	 }
 }
