@@ -114,11 +114,32 @@ public class SeamCarving {
 		Edge edge;
 		int noVertice = 2; // Compteur indiquant quel sommet manipuler
 		// Construction du graphe via double itération
+		boolean top = false;
 		for (int i = 0 ; i < nb_lignes ; i++) {
 		    for (int j = 0 ; j < nb_colonnes ; j++) {
 			if (i == 0) { // On est au sommet du graphe
 			    edge = new Edge(1, noVertice, 0);
 			    graph.addEdge(edge);
+			    if (j == 0) { // On est tout en haut à gauche du graphe
+				edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j]);
+				graph.addEdge(edge);
+				edge = new Edge(noVertice, noVertice + nb_colonnes + 1, itr[i][j]);
+				graph.addEdge(edge);
+			    }
+			    else if (j == nb_colonnes - 1) { // On est tout en haut à droite du graphe
+				edge = new Edge(noVertice, noVertice + nb_colonnes - 1, itr[i][j]);
+				graph.addEdge(edge);
+				edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j]);
+				graph.addEdge(edge);
+			    }
+			    else { // On est tout en haut quelque part au milieu du graphe
+				edge = new Edge(noVertice, noVertice + nb_colonnes - 1, itr[i][j]);
+				graph.addEdge(edge);
+				edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j]);
+				graph.addEdge(edge);
+				edge = new Edge(noVertice, noVertice + nb_colonnes + 1, itr[i][j]);
+				graph.addEdge(edge);
+			    }
 			}
 			else if (i == nb_lignes - 1) { // On est au pied du graphe
 			    edge = new Edge(noVertice, nb_lignes * nb_colonnes + 2, itr[i][j]);
@@ -136,7 +157,7 @@ public class SeamCarving {
 			    edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j]);
 			    graph.addEdge(edge);
 			}
-			else { // On est quelque aprt dans le graphe sauf à un des bords
+			else { // On est quelque part dans le graphe sauf à un des bords
 			    edge = new Edge(noVertice, noVertice + nb_colonnes - 1, itr[i][j]);
 			    graph.addEdge(edge);
 			    edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j]);
@@ -146,15 +167,79 @@ public class SeamCarving {
 			}
 			noVertice++;
 		    }
-		    if (i == 0) {
-			noVertice = 2;
-		    }	
 		}
 		return graph;
 	}
+
+    public static ArrayList<Integer> tritopo(Graph g) {
+	// verticesEnd : Liste qui indique l'ordre dans lequel on a finit de visiter les commets
+	ArrayList<Integer> verticesEnd = new ArrayList<>();
+	int n = g.vertices();
+        boolean visite[] = new boolean[n*n+2] ;
+	dfs(g, 1, visite, verticesEnd); // Execution du parcours en profondeur avec remplissage de verticesEnd
+	// Inversion de la Liste verticesEnd afin d'obtenir le tri topologique
+	int verticesStart = 0;
+	int verticesFinish = verticesEnd.size() - 1;
+	int temp;
+	while (verticesStart < verticesFinish) {
+	    temp = verticesEnd.get(verticesStart);
+	    verticesEnd.set(verticesStart, verticesEnd.get(verticesFinish));
+	    verticesEnd.set(verticesFinish, temp);
+	    verticesStart++;
+	    verticesFinish--;
+	}
+	return verticesEnd;
+    }
+    
+    private static void dfs(Graph g, int u,  boolean[] visite, ArrayList<Integer> verticesEnd) {
+		visite[u] = true;
+		for (Edge e: g.next(u)) {
+		    if (!visite[e.to]) {
+			dfs(g,e.to, visite, verticesEnd);
+		    }
+		}
+		verticesEnd.add(u);
+	 }
+
+    public static ArrayList<Integer> bellman(Graph g, int s, int t, ArrayList<Integer> order) {
+	// val : Liste qui contient les coux minimaux pour chaque sommets
+	ArrayList<Integer> val = new ArrayList<>(g.vertices());
+	// valA : Liste qui contient le sommet d'origine du chemin minimal pour chaque sommet 
+	ArrayList<Integer> valA = new ArrayList<>();
+	// ccm : LIst qui contient le chemin de cout minimal depuis s vers t
+	ArrayList<Integer> ccm = new ArrayList<>();
+	int costOld; // ancien cout minimal calculé pour un sommet u
+	int costNew; // nouveau cout minimal calculé pour un sommet u
+	val.add(0); // initialisation du 1er sommet à 0 (ne coute rien pour aller à lui-meme)
+	// initialisation de tous les autres sommets à "plus infini"
+	for (int i = 1 ; i < g.vertices() ; i++) {
+	    val.add(999999999);
+	}
+	// initialisation des sommets d'origine du plus court chemin pur chaque sommet
+	for (int i = 1 ; i < g.vertices() ; i++) {
+	    valA.add(1);
+	}
+	// evaluation du ccm pour chaque sommets dans l'ordre du tri topo
+	for (int v : order) {
+	    for (Edge e: g.next(v)) {
+		costNew = val.get(e.from-1) + e.cost;
+		costOld = val.get(e.to-1);
+		if (costNew < costOld) {
+		    val.set(e.to-1, costNew);
+		    valA.set(e.to-1, e.from);
+		}
+	    }
+	}
+	// construction du chemin de cout minimal depuis s vers t en partant de t
+        int currentVertice = t;
+	while (currentVertice != s) {
+	    ccm.add(0, currentVertice);
+	    currentVertice = valA.get(currentVertice - 1);
+	}
+	return valA;
+    }
+
 }
-
-
 
 /* Structure d'une image pgm
 P2
