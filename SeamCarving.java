@@ -46,7 +46,7 @@ public class SeamCarving {
 	 * @param filename nom du fichier
 	 */
   public static void writepgm(int[][] image, String filename) {
-    File file = new File(filename);
+	  File file = new File(filename);
     	try {
 	    if (!file.exists()) {
 			file.createNewFile();	// Création du fichier s'il n'existe pas
@@ -75,12 +75,14 @@ public class SeamCarving {
 
 	}
   }
-	
+
 	/**
-		Construit le tableau d'intérêt de pixels à partir d'une image donnée 
-	*/
+	 * Construit le tableau d'interet de pixels a partir d'une image donnee
+	 * @param image tableau de pixel de l'image source
+	 * @return tableau d'interet de l'image
+	 */
 	public static int[][] interest(int[][] image) {
-		// Récupération de la longueur de largeur de l'image
+		// Récupération de la longueur et de la largeur de l'image
 		int nb_lignes = image.length;
 		int nb_colonnes = image[0].length;
 		 // Création du tableau d'intérêt des pixels
@@ -103,9 +105,14 @@ public class SeamCarving {
 		}
 		return pixelsInterest;
 	}
-	
+
+	/**
+	 * Mise en graphe d'une image
+	 * @param itr tableau de pixels de l'image
+	 * @return graphe de l'image
+	 */
 	public static Graph toGraph(int[][] itr) {
-		// Récupération de la longueur de largeur de l'image
+		// Récupération de la longueur et de la largeur de l'image
 		int nb_lignes = itr.length;
 		int nb_colonnes = itr[0].length;
 		// Création du graphe vide
@@ -172,7 +179,7 @@ public class SeamCarving {
 	}
 
     public static ArrayList<Integer> tritopo(Graph g) {
-	// verticesEnd : Liste qui indique l'ordre dans lequel on a finit de visiter les commets
+	// verticesEnd : Liste qui indique l'ordre dans lequel on a fini de visiter les sommets
 	ArrayList<Integer> verticesEnd = new ArrayList<>();
 	int n = g.vertices();
         boolean visite[] = new boolean[n*n+2] ;
@@ -202,11 +209,11 @@ public class SeamCarving {
 	 }
 
     public static ArrayList<Integer> bellman(Graph g, int s, int t, ArrayList<Integer> order) {
-	// val : Liste qui contient les coux minimaux pour chaque sommets
+	// val : Liste qui contient les coûts minimaux pour chaque sommet
 	ArrayList<Integer> val = new ArrayList<>(g.vertices());
 	// valA : Liste qui contient le sommet d'origine du chemin minimal pour chaque sommet 
 	ArrayList<Integer> valA = new ArrayList<>();
-	// ccm : LIst qui contient le chemin de cout minimal depuis s vers t
+	// ccm : Liste qui contient le chemin de coût minimal depuis s vers t
 	ArrayList<Integer> ccm = new ArrayList<>();
 	int costOld; // ancien cout minimal calculé pour un sommet u
 	int costNew; // nouveau cout minimal calculé pour un sommet u
@@ -219,7 +226,7 @@ public class SeamCarving {
 	for (int i = 1 ; i < g.vertices() ; i++) {
 	    valA.add(1);
 	}
-	// evaluation du ccm pour chaque sommets dans l'ordre du tri topo
+	// evaluation du ccm pour chaque sommet dans l'ordre du tri topologique
 	for (int v : order) {
 	    for (Edge e: g.next(v)) {
 		costNew = val.get(e.from-1) + e.cost;
@@ -231,7 +238,7 @@ public class SeamCarving {
 	    }
 	}
 	// construction du chemin de cout minimal depuis s vers t en partant de t
-        int currentVertice = t;
+    int currentVertice = t;
 	while (currentVertice != s) {
 	    ccm.add(0, currentVertice);
 	    currentVertice = valA.get(currentVertice - 1);
