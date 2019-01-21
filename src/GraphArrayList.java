@@ -1,3 +1,5 @@
+package src;
+
 import java.util.ArrayList;
 import java.io.*;
 
@@ -34,8 +36,8 @@ public class GraphArrayList extends Graph {
 	 * @param e arete a ajouter
 	 */
 	public void addEdge(Edge e) {
-		int v = e.from;
-		int w = e.to;
+		int v = e.getVerticeOrigin();
+		int w = e.getVerticeDestination();
 		adj[v].add(e);
 		adj[w].add(e);
 	 }
@@ -57,7 +59,7 @@ public class GraphArrayList extends Graph {
    public Iterable<Edge> next(int v) {
 		ArrayList<Edge> n = new ArrayList<Edge>();
 		for (Edge e: adj[v])
-		  if (e.to != v)
+		  if (e.getVerticeDestination() != v)
 			n.add(e);
 		return n;
 	 }
@@ -70,7 +72,7 @@ public class GraphArrayList extends Graph {
 	public Iterable<Edge> prev(int v) {
 		ArrayList<Edge> n = new ArrayList<Edge>();
 		for (Edge e: adj[v])
-		  if (e.from != v)
+		  if (e.getVerticeOrigin() != v)
 			n.add(e);
 		return n;
 	 }
@@ -83,7 +85,7 @@ public class GraphArrayList extends Graph {
 	ArrayList<Edge> list = new ArrayList<Edge>();
         for (int v = 0; v < V; v++) {
 			for (Edge e : adj(v)) {
-				if (e.to != v)
+				if (e.getVerticeDestination() != v)
 					list.add(e);
 			}
 		}

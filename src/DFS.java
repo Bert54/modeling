@@ -1,3 +1,5 @@
+package src;
+
 import java.util.Stack;
 
 // Parcours en profondeur d'abord

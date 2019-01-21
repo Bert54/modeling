@@ -1,6 +1,8 @@
+package src;
+
 import java.io.*;
 
-abstract class Graph {
+public abstract class Graph {
 
    public abstract int vertices();	// Nombre de sommets
    
@@ -20,7 +22,7 @@ abstract class Graph {
 			int n = vertices();
 			for (u = 0; u < n;  u++) {
 				for (Edge e : next(u)) {
-					writer.println(e.from + "->" + e.to + "[label=\"" + e.cost + "\"];");
+					writer.println(e.getVerticeOrigin() + "->" + e.getVerticeDestination() + "[label=\"" + e.getEdgeCost() + "\"];");
 				}
 			}
 			writer.println("}");

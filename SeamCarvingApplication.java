@@ -1,7 +1,8 @@
 import java.io.File;
 import java.util.ArrayList;
+import src.*;
 
-public class main {
+public class SeamCarvingApplication {
 
     /**
      * 1ier argument : nom de l'image source
@@ -43,15 +44,40 @@ public class main {
         ArrayList<Integer> arl;
         ArrayList<Integer> bm;
         image = SeamCarving.readpgm(nom + ".pgm");  // Mise en tableau de l'image
-        for(int i = 0 ; i < 50 ; i++) {
+	int nbIte = 50;
+	int picture_width = image[0].length;
+	int[][] newImage;
+	int newImageWidthInd;
+	int newImageHeightInd;
+	while (picture_width > 0 && nbIte > 0) {
             interest = SeamCarving.interest(image); // On vérifie les coefficients d'interet des pixels
             graph = SeamCarving.toGraph(interest);    // Mise en graphe du tableau d'interet
             arl = SeamCarving.tritopo(graph);               // Tri topologique sur le graphe
             bm = SeamCarving.bellman(graph, 1, graph.vertices() - 1, arl);    // Application de Bellman
-            for (Integer in : bm) {   // On parcourt les sommets constituant le plus court chemin
-            // Supprimer les pixels de l'image...
+	    bm.remove(bm.size()-1); // On enlève également le dernier sommet dans le chemin, puisque celui-ci n'est pas un pixel dans l'image
+            for (Integer in : bm) {   // On parcourt les sommets constituant le plus court chemin et on supprime le pixel correspondant
+		int row = (in-1) / picture_width;
+		int column = ((in-1) % picture_width);
+		image[row][column] = -1;
             }
-        }
+	    picture_width--;
+	    nbIte--;
+	    newImage = new int[image.length][picture_width];
+	    newImageWidthInd = 0;
+	    newImageHeightInd = 0;
+	    for (int i = 0 ; i < image.length ; i++) {
+		for (int j = 0 ; j < image[0].length ; j++) {
+		    if (image[j][i] >= 0) {
+			System.out.println(newImageHeightInd + " " + newImageWidthInd + "\n");
+			newImage[newImageHeightInd][newImageWidthInd] = image[i][j];
+			newImageWidthInd++;
+		    }
+		}
+		newImageWidthInd = 0;
+		newImageHeightInd++;
+	    }
+	    image = newImage;
+	}
         String nomCarving = nom + "_seamCarving.pgm";   // Nouveau nom du fichier
         SeamCarving.writepgm(image, nomCarving); // On ne remplace pas le fichier d'origine
         System.out.println("Le fichier a été créé sous " + nomCarving);

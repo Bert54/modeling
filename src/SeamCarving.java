@@ -1,3 +1,5 @@
+package src;
+
 import java.util.ArrayList;
 import java.io.*;
 import java.util.*;
@@ -182,7 +184,7 @@ public class SeamCarving {
 	// verticesEnd : Liste qui indique l'ordre dans lequel on a fini de visiter les sommets
 	ArrayList<Integer> verticesEnd = new ArrayList<>();
 	int n = g.vertices();
-        boolean visite[] = new boolean[n*n+2] ;
+        boolean visite[] = new boolean[n] ; //Tableau des sommets visité pour le DFS
 	dfs(g, 1, visite, verticesEnd); // Execution du parcours en profondeur avec remplissage de verticesEnd
 	// Inversion de la Liste verticesEnd afin d'obtenir le tri topologique
 	int verticesStart = 0;
@@ -201,8 +203,8 @@ public class SeamCarving {
     private static void dfs(Graph g, int u,  boolean[] visite, ArrayList<Integer> verticesEnd) {
 		visite[u] = true;
 		for (Edge e: g.next(u)) {
-		    if (!visite[e.to]) {
-			dfs(g,e.to, visite, verticesEnd);
+		    if (!visite[e.getVerticeDestination()]) {
+			dfs(g, e.getVerticeDestination(), visite, verticesEnd);
 		    }
 		}
 		verticesEnd.add(u);
@@ -229,21 +231,21 @@ public class SeamCarving {
 	// evaluation du ccm pour chaque sommet dans l'ordre du tri topologique
 	for (int v : order) {
 	    for (Edge e: g.next(v)) {
-		costNew = val.get(e.from-1) + e.cost;
-		costOld = val.get(e.to-1);
+		costNew = val.get(e.getVerticeOrigin()-1) + e.getEdgeCost();
+		costOld = val.get(e.getVerticeDestination()-1);
 		if (costNew < costOld) {
-		    val.set(e.to-1, costNew);
-		    valA.set(e.to-1, e.from);
+		    val.set(e.getVerticeDestination()-1, costNew);
+		    valA.set(e.getVerticeDestination()-1, e.getVerticeOrigin());
 		}
 	    }
 	}
 	// construction du chemin de cout minimal depuis s vers t en partant de t
-    int currentVertice = t;
+	int currentVertice = t;
 	while (currentVertice != s) {
 	    ccm.add(0, currentVertice);
 	    currentVertice = valA.get(currentVertice - 1);
 	}
-	return valA;
+	return ccm;
     }
 
 }

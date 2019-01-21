@@ -1,4 +1,5 @@
 import java.util.*;
+import src.*;
 
 public class Test {
 
@@ -8,8 +9,8 @@ public class Test {
 		visite[u] = true;
 		System.out.println("Je visite " + u);
 		for (Edge e: g.next(u))
-		  if (!visite[e.to])
-			dfs(g,e.to);
+		  if (!visite[e.getVerticeDestination()])
+			dfs(g,e.getVerticeDestination());
 	 }
    
    public static void testGraph() {
@@ -46,6 +47,9 @@ public class Test {
 		arl = SeamCarving.tritopo(graphe);
 		ArrayList<Integer> ccm = new ArrayList<>();
 		ccm = SeamCarving.bellman(graphe, 1, graphe.vertices() - 1, arl);
+		for (Integer in : ccm) {   
+		    System.out.println(in);
+		}
 		//SeamCarving.writepgm(image, "waw.pgm");
 	 }
 }
