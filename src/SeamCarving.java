@@ -80,7 +80,7 @@ public class SeamCarving {
 
 	/**
 	 * Construit le tableau d'interet de pixels a partir d'une image donnee
-	 * @param image tableau de pixel de l'image source
+	 * @param image tableau de pixels de l'image source
 	 * @return tableau d'interet de l'image
 	 */
 	public static int[][] interest(int[][] image) {
@@ -180,6 +180,11 @@ public class SeamCarving {
 		return graph;
 	}
 
+    /**
+     * Application du tri topologique (ordre inverse de l'ordre de fin) sur une image 
+     * @param g graphe d'une image
+     * @return Ordre des sommets suivant un tri topologique
+     */
     public static ArrayList<Integer> tritopo(Graph g) {
 	// verticesEnd : Liste qui indique l'ordre dans lequel on a fini de visiter les sommets
 	ArrayList<Integer> verticesEnd = new ArrayList<>();
@@ -190,6 +195,7 @@ public class SeamCarving {
 	int verticesStart = 0;
 	int verticesFinish = verticesEnd.size() - 1;
 	int temp;
+	// Inversion de l'ordre de fin pour avoir le tri topologique
 	while (verticesStart < verticesFinish) {
 	    temp = verticesEnd.get(verticesStart);
 	    verticesEnd.set(verticesStart, verticesEnd.get(verticesFinish));
@@ -200,16 +206,31 @@ public class SeamCarving {
 	return verticesEnd;
     }
     
+    /**
+     * Application récursive d'un parcours en profondeur sur un graphe
+     * @param g graphe d'une image
+     * @param u sommet de départ
+     * @param visite tableau qui indique si un sommet a été visité ou non
+     * @param verticesEnd ordre de fin de lecture des sommets
+     */
     private static void dfs(Graph g, int u,  boolean[] visite, ArrayList<Integer> verticesEnd) {
-		visite[u] = true;
-		for (Edge e: g.next(u)) {
+		visite[u] = true;	// Le sommet en cours est visité
+		for (Edge e: g.next(u)) {	// Exploration des sommets suivants
 		    if (!visite[e.getVerticeDestination()]) {
 			dfs(g, e.getVerticeDestination(), visite, verticesEnd);
 		    }
 		}
-		verticesEnd.add(u);
+		verticesEnd.add(u);	// Ajout du sommet à l'ordre de fin de lecture
 	 }
 
+     /**
+      * Calcule et retourne le plus court chemin d'un graphe
+      * @param g graph de l'image
+      * @param s sommet de départ
+      * @param t sommet d'arrivée
+      * @param order ordre du tri topologique
+      * @return liste des sommets formant le plus court chemin
+      */
     public static ArrayList<Integer> bellman(Graph g, int s, int t, ArrayList<Integer> order) {
 	// val : Liste qui contient les coûts minimaux pour chaque sommet
 	ArrayList<Integer> val = new ArrayList<>(g.vertices());
@@ -240,8 +261,8 @@ public class SeamCarving {
 	    }
 	}
 	// construction du chemin de cout minimal depuis s vers t en partant de t
-	int currentVertice = t;
-	while (currentVertice != s) {
+	int currentVertice = t;	// On part de la fin
+	while (currentVertice != s) {	// Tant qu'on est pas arrivé au début
 	    ccm.add(0, currentVertice);
 	    currentVertice = valA.get(currentVertice - 1);
 	}
