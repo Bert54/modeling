@@ -58,6 +58,9 @@ public class SeamCarvingApplication {
             for (Integer in : bm) {   // On parcourt les sommets constituant le plus court chemin et on supprime le pixel correspondant
 		int row = (in-1) / picture_width;
 		int column = ((in-1) % picture_width);
+		if (row > image.length-1) {
+		    row = image.length-1;
+		}
 		image[row][column] = -1;
             }
 	    picture_width--;
@@ -65,10 +68,9 @@ public class SeamCarvingApplication {
 	    newImage = new int[image.length][picture_width];
 	    newImageWidthInd = 0;
 	    newImageHeightInd = 0;
-	    for (int i = 0 ; i < image.length ; i++) {
-		for (int j = 0 ; j < image[0].length ; j++) {
-		    if (image[j][i] >= 0) {
-			System.out.println(newImageHeightInd + " " + newImageWidthInd + "\n");
+	    for (int i = 0 ; i < image.length-1 ; i++) {
+		for (int j = 0 ; j < image[0].length-1 ; j++) {
+		    if (image[i][j] >= 0) {
 			newImage[newImageHeightInd][newImageWidthInd] = image[i][j];
 			newImageWidthInd++;
 		    }
