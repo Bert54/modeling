@@ -47,8 +47,11 @@ public class Test {
 		arl = SeamCarving.tritopo(graphe);
 		ArrayList<Integer> ccm = new ArrayList<>();
 		ccm = SeamCarving.bellman(graphe, 1, graphe.vertices() - 1, arl);
-		for (Integer in : ccm) {   
-		    System.out.println(in);
+		for (int i = 0 ; i < interest.length ; i++) {
+		    for (int j = 0 ; j < interest[0].length ; j++) {
+			System.out.print(interest[i][j] + " ");
+		    }
+		    System.out.println();
 		}
 		//SeamCarving.writepgm(image, "waw.pgm");
 	 }

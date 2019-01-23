@@ -117,30 +117,33 @@ public class DFS {
 
     }
     
+    /**
+     * DFS Iteratif
+     */
     public static ArrayList<Integer> iterativeDfs(Graph g, int u) {
-	ArrayList<Integer> verticesEnd = new ArrayList<>();
-	boolean visite[] = new boolean[g.vertices()];
-	Stack<Integer> stackVertices = new Stack<Integer>();
-	Stack<Iterator<Edge>> stackVerticesIterators = new Stack<Iterator<Edge>>();
-	stackVertices.push(u);
-	stackVerticesIterators.push(g.next(u).iterator());
-	visite[u] = true;
-	int vertice;
-	while (!stackVerticesIterators.empty()) {
-	    if (stackVerticesIterators.peek().hasNext()) {
-		vertice = stackVerticesIterators.peek().next().getVerticeDestination();
-		if (visite[vertice] == false) {
-		    stackVerticesIterators.push(g.next(vertice).iterator());
-		    stackVertices.push(vertice);
-		    visite[vertice] = true;
+	ArrayList<Integer> verticesEnd = new ArrayList<>(); // Collection qui va contenir l'ordre des sommets de fin
+	boolean visite[] = new boolean[g.vertices()]; // Table des sommets visité
+	Stack<Integer> stackVertices = new Stack<Integer>(); // Pile qui va contenir les sommets en cours de visite
+	Stack<Iterator<Edge>> stackVerticesIterators = new Stack<Iterator<Edge>>(); // Pile qui va contenir des iterateurs des sommets en cours de visite
+	stackVertices.push(u); // Ajout du sommet d'origine
+	stackVerticesIterators.push(g.next(u).iterator()); // Ajout de l'itérateur du sommet d'origine
+	visite[u] = true; // Le 1er sommet est d'office en cours de visite
+	int vertice; // Conteneur pour le sommet en cours de visite qu'on est en train d'évaluer
+	while (!stackVerticesIterators.empty()) { // Tant que la pile des itérateurs n'est pas vide
+	    if (stackVerticesIterators.peek().hasNext()) { // On regarde si le sommet en tete de pile possède un voisin qu'on a pas encore visité depuis ce sommet
+		vertice = stackVerticesIterators.peek().next().getVerticeDestination(); // On récupère un voisin qu'on a pas encore regardé
+		if (visite[vertice] == false) { // On regarde si on a déjà commencé à visiter ce voisin
+		    stackVerticesIterators.push(g.next(vertice).iterator()); // On ajoute l'itérateur dans la pile
+		    stackVertices.push(vertice); // Ainsi que son sommet associé
+		    visite[vertice] = true; // ON indique qu'on a commencé à visiter ce voisin
 		}
 	    }
-	    else {
-	        verticesEnd.add(stackVertices.pop());
-		stackVerticesIterators.pop();
+	    else { // On a finit de visiter tous les voisins
+	        verticesEnd.add(stackVertices.pop()); // On enlève le sommet de la pile et on le place dans la liste des sommets de fin
+		stackVerticesIterators.pop(); // On enlève l'itérateur de la pile
 	    }
 	}
-	return verticesEnd;
+	return verticesEnd; // On retourne la liste des sommets de fin
     }
 
     public static void main(String[] args)

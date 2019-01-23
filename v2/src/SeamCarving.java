@@ -130,48 +130,56 @@ public class SeamCarving {
 			    edge = new Edge(1, noVertice, 0);
 			    graph.addEdge(edge);
 			    if (j == 0) { // On est tout en haut à gauche du graphe
-				edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j]);
+				edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j + 1]);
 				graph.addEdge(edge);
-				edge = new Edge(noVertice, noVertice + nb_colonnes + 1, itr[i][j]);
+				edge = new Edge(noVertice, noVertice + nb_colonnes + 1, Math.abs(itr[i][j + 1] - itr[i + 1][j]));
 				graph.addEdge(edge);
 			    }
 			    else if (j == nb_colonnes - 1) { // On est tout en haut à droite du graphe
-				edge = new Edge(noVertice, noVertice + nb_colonnes - 1, itr[i][j]);
+				edge = new Edge(noVertice, noVertice + nb_colonnes - 1, Math.abs(itr[i][j - 1] - itr[i + 1][j]));
 				graph.addEdge(edge);
-				edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j]);
+				edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j - 1]);
 				graph.addEdge(edge);
 			    }
 			    else { // On est tout en haut quelque part au milieu du graphe
-				edge = new Edge(noVertice, noVertice + nb_colonnes - 1, itr[i][j]);
+				edge = new Edge(noVertice, noVertice + nb_colonnes, Math.abs(itr[i][j - 1] - itr[i + 1][j]));
 				graph.addEdge(edge);
-				edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j]);
+				edge = new Edge(noVertice, noVertice + nb_colonnes - 1, Math.abs(itr[i][j + 1] - itr[i][j - 1]));
 				graph.addEdge(edge);
-				edge = new Edge(noVertice, noVertice + nb_colonnes + 1, itr[i][j]);
+				edge = new Edge(noVertice, noVertice + nb_colonnes + 1, Math.abs(itr[i][j + 1] - itr[i + 1][j]));
 				graph.addEdge(edge);
 			    }
 			}
 			else if (i == nb_lignes - 1) { // On est au pied du graphe
-			    edge = new Edge(noVertice, nb_lignes * nb_colonnes + 2, itr[i][j]);
+			    if (j == 0) {
+				edge = new Edge(noVertice, nb_lignes * nb_colonnes + 2, itr[i][j + 1]);
+			    }
+			    else if (j == nb_colonnes - 1) {
+				edge = new Edge(noVertice, nb_lignes * nb_colonnes + 2, itr[i][j - 1]);
+			    }
+			    else {
+				edge = new Edge(noVertice, nb_lignes * nb_colonnes + 2, Math.abs(itr[i][j + 1] - itr[i][j - 1]));
+			    }
 			    graph.addEdge(edge);
 			}
 			else if (j == 0) { // On est tout à gauche du graphe
-			    edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j]);
+			    edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j + 1]);
 			    graph.addEdge(edge);
-			    edge = new Edge(noVertice, noVertice + nb_colonnes + 1, itr[i][j]);
+			    edge = new Edge(noVertice, noVertice + nb_colonnes + 1, Math.abs(itr[i][j + 1] - itr[i + 1][j]));
 			    graph.addEdge(edge);
 			}
 			else if (j == nb_colonnes - 1) { // On est tout à droite du graphe
-			    edge = new Edge(noVertice, noVertice + nb_colonnes - 1, itr[i][j]);
+			    edge = new Edge(noVertice, noVertice + nb_colonnes - 1, Math.abs(itr[i][j - 1] - itr[i + 1][j]));
 			    graph.addEdge(edge);
-			    edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j]);
+			    edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j - 1]);
 			    graph.addEdge(edge);
 			}
 			else { // On est quelque part dans le graphe sauf à un des bords
-			    edge = new Edge(noVertice, noVertice + nb_colonnes - 1, itr[i][j]);
+			    edge = new Edge(noVertice, noVertice + nb_colonnes, Math.abs(itr[i][j - 1] - itr[i + 1][j]));
 			    graph.addEdge(edge);
-			    edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j]);
+			    edge = new Edge(noVertice, noVertice + nb_colonnes - 1, Math.abs(itr[i][j + 1] - itr[i][j - 1]));
 			    graph.addEdge(edge);
-			    edge = new Edge(noVertice, noVertice + nb_colonnes + 1, itr[i][j]);
+			    edge = new Edge(noVertice, noVertice + nb_colonnes + 1, Math.abs(itr[i][j + 1] - itr[i + 1][j]));
 			    graph.addEdge(edge);
 			}
 			noVertice++;
@@ -179,6 +187,71 @@ public class SeamCarving {
 		}
 		return graph;
 	}
+    /*
+    public static Graph toImplicitGraph(int[][] itr, int w, int h) {
+	// Création du graphe vide
+	// Nombre de sommets = w * h + 2 pour les premier et dernier sommets
+	GraphImplicit graph = new GrapImplicit(w * h + 3);
+	Edge edge;
+	int noVertice = 2; // Compteur indiquant quel sommet manipuler
+	// Construction du graphe via double itération
+	boolean top = false;
+	for (int i = 0 ; i < nb_lignes ; i++) {
+	    for (int j = 0 ; j < nb_colonnes ; j++) {
+		if (i == 0) { // On est au sommet du graphe
+		    edge = new Edge(1, noVertice, 0);
+		    graph.addEdge(edge);
+		    if (j == 0) { // On est tout en haut à gauche du graphe
+			edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j]);
+			graph.addEdge(edge);
+			edge = new Edge(noVertice, noVertice + nb_colonnes + 1, itr[i][j]);
+			graph.addEdge(edge);
+		    }
+		    else if (j == nb_colonnes - 1) { // On est tout en haut à droite du graphe
+			edge = new Edge(noVertice, noVertice + nb_colonnes - 1, itr[i][j]);
+			graph.addEdge(edge);
+			edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j]);
+			graph.addEdge(edge);
+		    }
+		    else { // On est tout en haut quelque part au milieu du graphe
+			edge = new Edge(noVertice, noVertice + nb_colonnes - 1, itr[i][j]);
+			graph.addEdge(edge);
+			edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j]);
+			graph.addEdge(edge);
+			edge = new Edge(noVertice, noVertice + nb_colonnes + 1, itr[i][j]);
+			graph.addEdge(edge);
+		    }
+		}
+		else if (i == nb_lignes - 1) { // On est au pied du graphe
+		    edge = new Edge(noVertice, nb_lignes * nb_colonnes + 2, itr[i][j]);
+		    graph.addEdge(edge);
+		}
+		else if (j == 0) { // On est tout à gauche du graphe
+		    edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j]);
+		    graph.addEdge(edge);
+		    edge = new Edge(noVertice, noVertice + nb_colonnes + 1, itr[i][j]);
+		    graph.addEdge(edge);
+		}
+		else if (j == nb_colonnes - 1) { // On est tout à droite du graphe
+		    edge = new Edge(noVertice, noVertice + nb_colonnes - 1, itr[i][j]);
+		    graph.addEdge(edge);
+		    edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j]);
+		    graph.addEdge(edge);
+		}
+		else { // On est quelque part dans le graphe sauf à un des bords
+		    edge = new Edge(noVertice, noVertice + nb_colonnes - 1, itr[i][j]);
+		    graph.addEdge(edge);
+		    edge = new Edge(noVertice, noVertice + nb_colonnes, itr[i][j]);
+		    graph.addEdge(edge);
+		    edge = new Edge(noVertice, noVertice + nb_colonnes + 1, itr[i][j]);
+		    graph.addEdge(edge);
+		}
+		noVertice++;
+	    }
+	}
+	return graph;
+    }
+    */
 
     /**
      * Application du tri topologique (ordre inverse de l'ordre de fin) sur une image 
@@ -190,8 +263,9 @@ public class SeamCarving {
 	ArrayList<Integer> verticesEnd;
 	int n = g.vertices();
         boolean visite[] = new boolean[n] ; //Tableau des sommets visité pour le DFS
+	//Ancien DFS (juste en-dessous de cette méthode)
 	//dfs(g, 1, visite, verticesEnd); // Execution du parcours en profondeur avec remplissage de verticesEnd
-	verticesEnd = DFS.iterativeDfs(g, 1);
+	verticesEnd = DFS.iterativeDfs(g, 1); // Nouveau DFS contenu dans DFS.java)
 	// Inversion de la Liste verticesEnd afin d'obtenir le tri topologique
 	int verticesStart = 0;
 	int verticesFinish = verticesEnd.size() - 1;
