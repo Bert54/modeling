@@ -42,6 +42,44 @@ public class SeamCarving {
     }
   }
 
+    /**
+	 * Lecture d'un fichier de format ppm
+	 * @param fn nom du fichier
+	 * @return tableau representant la valeur de la couleur des pixels
+	 * Format ppm : pixel en niveau de couleur de 0 à 255 sur 3 octets par pixel
+	 */
+    public static int[][][] readppm(String fn) {		
+	try {
+	    InputStream f = ClassLoader.getSystemClassLoader().getResourceAsStream(fn);
+	    BufferedReader d = new BufferedReader(new InputStreamReader(f));
+	    String magic = d.readLine();
+	    String line = d.readLine();
+	    while (line.startsWith("#")) {
+		line = d.readLine();
+	    }
+	    Scanner s = new Scanner(line);
+	    int width = s.nextInt();
+	    int height = s.nextInt();
+	    line = d.readLine();
+	    s = new Scanner(line);
+	    int maxVal = s.nextInt();
+	    int[][][] im = new int[height][width][3];
+	    s = new Scanner(d);
+	    int count = 0;
+	    while (count < height*width) {
+		im[count / width][count % width][0] = s.nextInt();
+		im[count / width][count % width][1] = s.nextInt();
+		im[count / width][count % width][2] = s.nextInt();
+		count++;
+	    }
+	    return im;
+	}
+	catch(Throwable t) {
+	    t.printStackTrace(System.err) ;
+	    return null;
+	}
+    }
+    
 	/**
 	 * Ecrit un fichier en format pgm
 	 * @param image tableau representant la valeur de la couleur des pixels
@@ -78,6 +116,46 @@ public class SeamCarving {
 	}
   }
 
+    /**
+     * Ecrit un fichier en format ppm
+     * @param image tableau representant la valeur de la couleur des pixels
+     * @param filename nom du fichier
+     */
+    public static void writeppm(int[][][] image, String filename) {
+	File file = new File(filename);
+    	try {
+	    if (!file.exists()) {
+		file.createNewFile();	// Création du fichier s'il n'existe pas
+	    }
+	    int nb_lignes = image.length;
+	    int nb_colonnes = image[0].length;
+	    FileWriter fw = new FileWriter(file);
+	    BufferedWriter buffer = new BufferedWriter(fw);
+	    buffer.write("P3\n");
+	    buffer.write(nb_colonnes + " " + nb_lignes + "\n");
+	    buffer.write("255\n");		// valeur maximale d'une des couleur RGB
+	    int pixel;
+	    for(int i = 0 ; i < nb_lignes ; i++) {
+		for (int j = 0; j < nb_colonnes ; j++) {
+		    pixel = image[i][j][0];	// représente la valeur de la couleur rouge du pixel en i,j
+		    buffer.write(pixel + " ");	// écriture de la valeur de la couleur rouge du pixel
+		    pixel = image[i][j][1];	// représente la valeur de la couleur vert du pixel en i,j
+		    buffer.write(pixel + " ");	// écriture de la valeur de la couleur vert du pixel
+		    pixel = image[i][j][2];	// représente la valeur de la couleur bleu du pixel en i,j
+		    buffer.write(pixel + "");	// écriture de la valeur de la couleur bleu du pixel
+		    if (j < nb_colonnes-1) {	// le pixel n'est pas en fin de ligne, donc on ajoute un espace
+			buffer.write(" ");
+		    }
+		}
+		buffer.newLine();
+	    }
+	    buffer.close();
+	}
+	catch (Exception e) {
+	    
+	}
+    }
+    
 	/**
 	 * Construit le tableau d'interet de pixels a partir d'une image donnee
 	 * @param image tableau de pixels de l'image source
@@ -103,6 +181,46 @@ public class SeamCarving {
 					pixelInterestSingle = Math.abs(image[i][j]-((image[i][j-1]+image[i][j+1])/2));
 				}
 				pixelsInterest[i][j] = pixelInterestSingle;
+			}
+		}
+		return pixelsInterest;
+	}
+
+    	/**
+	 * Construit le tableau d'interet de pixels a partir d'une image RGB donnee
+	 * @param image tableau de pixels de l'image source
+	 * @return tableau d'interet de l'image
+	 */
+	public static int[][] interestRGB(int[][][] image) {
+		// Récupération de la longueur et de la largeur de l'image
+		int nb_lignes = image.length;
+		int nb_colonnes = image[0].length;
+		 // Création du tableau d'intérêt des pixels
+		int[][] pixelsInterest;
+		pixelsInterest = new int[nb_lignes][nb_colonnes];
+		int pixelInterestRed = 0;
+		int pixelInterestGreen = 0;
+		int pixelInterestBlue = 0;
+		int pixelInterestSingle = 0;
+		for (int i = 0 ; i < nb_lignes ; i++) {
+			for (int j = 0 ; j < nb_colonnes ; j++) {
+				if (j == 0) { // On est en début de ligne
+				    pixelInterestRed = Math.abs(image[i][j][0]-image[i][j+1][0]);
+				    pixelInterestGreen = Math.abs(image[i][j][1]-image[i][j+1][1]);
+				    pixelInterestBlue = Math.abs(image[i][j][2]-image[i][j+1][2]);
+				}
+				else if (j == nb_colonnes - 1) { // On est en fin de ligne
+				    pixelInterestRed = Math.abs(image[i][j][0]-image[i][j-1][0]);
+				    pixelInterestGreen = Math.abs(image[i][j][1]-image[i][j-1][1]);
+				    pixelInterestBlue = Math.abs(image[i][j][0]-image[i][j-1][2]);
+				}
+				else { // On est ni en début de ligne, ni en fin de ligne
+				    //pixelInterestSingle = Math.abs(image[i][j]-((image[i][j-1]+image[i][j+1])/2));
+				    pixelInterestRed = Math.abs(image[i][j][0]-((image[i][j-1][0]+image[i][j+1][0])/2));
+				    pixelInterestGreen = Math.abs(image[i][j][1]-((image[i][j-1][1]+image[i][j+1][1])/2));
+				    pixelInterestBlue = Math.abs(image[i][j][2]-((image[i][j-1][2]+image[i][j+1][2])/2));
+				}
+				pixelsInterest[i][j] = pixelInterestRed + pixelInterestBlue + pixelInterestGreen;
 			}
 		}
 		return pixelsInterest;

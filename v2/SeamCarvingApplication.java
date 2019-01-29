@@ -18,7 +18,14 @@ public class SeamCarvingApplication {
                 String ext = split[1];  // Extension du fichier
                 if(ext.equals("pgm")) { // On vérifie que l'extension est correcte
                     String nomSansExt = split[0];   // On récupère le nom sans extension
-                    supression50(nomSansExt);
+		    int[][] image = SeamCarving.readpgm(args[0]);  // Mise en tableau de l'image 
+		    image = supression50(image); // Suppression de 50 colonnes
+		    image = flipImage(image); // Inversion des lignes et des colonnes de l'image afin d'effectuer une suppression par lignes
+		    image = supression50(image); // Suppression de 50 lignes
+		    image = flipImage(image); // Reinversion pour retrouver l'image dans le bon sens
+		    String nomCarving = nomSansExt + "_seamCarving.pgm";   // Nouveau nom du fichier
+		    SeamCarving.writepgm(image, nomCarving); // On ne remplace pas le fichier d'origine
+		    System.out.println("Le fichier a été créé sous " + nomCarving);
                 }
                 else {
                     System.out.println("Mauvaise extension de fichier !\n");
@@ -37,13 +44,11 @@ public class SeamCarvingApplication {
      * Supprime 50 colonnes d'une image en suivant un seam carving
      * @param nom nom de l'image sans extension
      */
-    private static void supression50(String nom) {
-        int[][] image;
+    private static int[][] supression50(int[][] image) {
         int[][] interest;
         Graph graph;
         ArrayList<Integer> arl;
         ArrayList<Integer> bm;
-        image = SeamCarving.readpgm(nom + ".pgm");  // Mise en tableau de l'image
 	int nbIte = 50;	// Nombre de colonnes à supprimer
 	int picture_width = image[0].length;
 	int[][] newImage;
@@ -81,9 +86,19 @@ public class SeamCarvingApplication {
 	    }
 	    image = newImage;
 	}
-        String nomCarving = nom + "_seamCarving.pgm";   // Nouveau nom du fichier
-        SeamCarving.writepgm(image, nomCarving); // On ne remplace pas le fichier d'origine
-        System.out.println("Le fichier a été créé sous " + nomCarving);
+	return image;
+    }
+
+    private static int[][] flipImage(int[][] image) {
+	int width = image.length;
+	int height = image[0].length;
+	int[][] imageFlip = new int[height][width];
+	for (int i = 0 ; i < width ; i++) {
+	    for (int j = 0 ; j < height ; j++) {
+		imageFlip[j][i] = image[i][j];
+	    }
+	}	
+	return imageFlip;
     }
 
 }
