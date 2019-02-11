@@ -10,7 +10,7 @@ public class SeamCarvingApplication {
      * 1ier argument : nom de l'image source
      */
     public static void main(String[] args) {
-        if(args.length == 1) {
+        if(args.length == 3) {
             String source = args[0];    // Nom de l'image source
             File fSource = new File(source);    // Fichier représentant l'image source
             if(fSource.exists()) {  // Si le fichier source n'existe pas, on ne peut pas continuer
@@ -19,9 +19,9 @@ public class SeamCarvingApplication {
                 if(ext.equals("pgm")) { // On vérifie que l'extension est correcte
                     String nomSansExt = split[0];   // On récupère le nom sans extension
 		    int[][] image = SeamCarving.readpgm(args[0]);  // Mise en tableau de l'image 
-		    image = supression50(image); // Suppression de 50 colonnes
+		    image = suppression(image, Integer.parseInt(args[1])); // Suppression de n colonnes (donné en deuxième argument)
 		    image = flipImage(image); // Inversion des lignes et des colonnes de l'image afin d'effectuer une suppression par lignes
-		    image = supression50(image); // Suppression de 50 lignes
+		    image = suppression(image, Integer.parseInt(args[2])); // Suppression de m lignes (donné en troisième argument)
 		    image = flipImage(image); // Reinversion pour retrouver l'image dans le bon sens
 		    String nomCarving = nomSansExt + "_seamCarving.pgm";   // Nouveau nom du fichier
 		    SeamCarving.writepgm(image, nomCarving); // On ne remplace pas le fichier d'origine
@@ -36,25 +36,26 @@ public class SeamCarvingApplication {
             }
         }
         else {
-            System.out.println("Nombre d'arguments incorrect. <image src>\n");
+            System.out.println("Nombre d'arguments incorrect. <image src> <Nombre de colonnes à supprimer> <Nombre de lignes à supprimer>\n");
         }
     }
 
     /**
      * Supprime 50 colonnes d'une image en suivant un seam carving
      * @param nom nom de l'image sans extension
+     * @param nbIter nombre de colonnes à supprimer
      */
-    private static int[][] supression50(int[][] image) {
+    private static int[][] suppression(int[][] image, int nbIter) {
         int[][] interest;
         Graph graph;
         ArrayList<Integer> arl;
         ArrayList<Integer> bm;
-	int nbIte = 50;	// Nombre de colonnes à supprimer
+	int nbIte = nbIter;	// Nombre de colonnes à supprimer
 	int picture_width = image[0].length;
 	int[][] newImage;
 	int newImageWidthInd;
 	int newImageHeightInd;
-	while (picture_width > 0 && nbIte > 0) { // On gère le cas nb_colonnes < 50
+	while (picture_width > 0 && nbIte > 0) { // On gère le cas nb_colonnes < nbIter
             interest = SeamCarving.interest(image); // On vérifie les coefficients d'interet des pixels
             graph = SeamCarving.toGraph(interest);    // Mise en graphe du tableau d'interet
             arl = SeamCarving.tritopo(graph);               // Tri topologique sur le graphe
